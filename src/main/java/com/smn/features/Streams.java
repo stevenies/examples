@@ -66,7 +66,7 @@ public class Streams {
 
         System.out.println("\nPrint students stored by who has the heaviest course workload:");
         Arrays.stream(students)
-            .sorted(Comparator.comparing(s -> s.courses().size()))
+            .sorted(Comparator.comparing((Student s) -> s.courses().size()).reversed())
             // The above line is simpler, but the following line demonstrates how to use .reduce function to count the number of courses for each student, which is more flexible if we wanted to do something more complex than just counting.
             // Note that the reduce operation needs a Combiner function (Long::sum) to change the type from Long to long, which is required by the Comparator.comparing method.
             // .sorted(Comparator.comparing((Student s) -> s.courses().stream().reduce(0L, (sum, course) -> sum + 1, Long::sum)).reversed())

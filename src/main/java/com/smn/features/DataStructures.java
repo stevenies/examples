@@ -81,17 +81,19 @@ public class DataStructures {
         new Student_J8("Sheri", 64, Arrays.asList("Biology", "Riding")),
         new Student_J8("Jenny", 44, Arrays.asList("Math", "Teaching", "Classroom Management", "Education")),
         new Student_J8("Paul", 89, Arrays.asList("Math", "Electronics", "Raddars")),
-   };
+    };
 
-    // Create some test data using Java 9 List.of() method and Java 16 record.
+    // Create some test data using Java 9 List.of() method.
     static Student[] students = {
         new Student("Steve", 67, List.of("Math", "Physics")),
         new Student("Steve", 18, List.of("Math", "Physics")),  // Two students with the same name but different ages and courses
         new Student("Sheri", 64, List.of("Biology", "Riding")),
         new Student("Jenny", 44, List.of("Math", "Teaching", "Classroom Management", "Education")),
         new Student("Paul", 89, List.of("Math", "Electronics", "Raddars")),
-   };
+    };
 
+    // Create a list of classes offered at the school.
+    static List<String> classes = Stream.of(students).flatMap(s -> s.courses().stream()).distinct().toList();
 
     public static void main(String[] args) {
         System.out.println("Examples of various Java data structures:");
@@ -99,6 +101,12 @@ public class DataStructures {
         System.out.print("\nQuickly generate the first 10 powers of 2 using IntStream: ");
         int[] powersOfTwo = IntStream.iterate(1, n -> n * 2).limit(10).toArray();
         IntStream.of(powersOfTwo).forEach(e -> System.out.print(e + " "));
+        System.out.println();
+
+        System.out.print("\nUse a Comparator to sort students by age (old to young): ");
+        Arrays.stream(students)
+            .sorted(Comparator.comparingInt(Student::age).thenComparing(Student::name).reversed())
+            .forEach(s -> System.out.print(s.name() + " (" + s.age() + ") "));
         System.out.println();
 
         System.out.println("\nCreate a sorted TreeMap of students by name:");
@@ -131,6 +139,8 @@ public class DataStructures {
         // PriorityQueue<Student> queue = new PriorityQueue<>(64, (s1,s2) ->Integer.compare(s1.age(), s2.age()));
         PriorityQueue<Student> queue = new PriorityQueue<>(64, Comparator.comparingInt(Student::age));
         queue.addAll(Arrays.asList(students));
+        // Note that you can't use an iterator to remove items from a PriorityQueue because it doesn't guarantee
+        // the element order.  You must use the poll() method to remove elements in the correct order.
         while(!queue.isEmpty()) {
             Student s = queue.poll();
             System.out.println(s.name() + ", Age: " + s.age());
