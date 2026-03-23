@@ -1,4 +1,4 @@
-package com.smn.examples.java8;
+package com.smn.features;
 
 import java.util.concurrent.*;
 
