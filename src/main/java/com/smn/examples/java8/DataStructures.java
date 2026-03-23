@@ -1,7 +1,16 @@
 package com.smn.examples.java8;
     
 import java.util.*;
+import java.util.stream.*;
 
+/**
+ * This class demonstrates the use of various Java data structures.  The main Java data structures covered include:
+ * List: ArrayList, LinkedList
+ * Set: HashSet, LinkedHashSet, TreeSet
+ * Map: HashMap, LinkedHashMap, TreeMap
+ * Queue: LinkedList, PriorityQueue
+ * Deque: ArrayDeque, LinkedList
+ */
 public class DataStructures {
 
     // Create a class for use as test data  
@@ -52,16 +61,31 @@ public class DataStructures {
 
     // Create some test data
     static Student[] students = {
-        new Student("Steve", 67, List.of("Math", "Physics")),
-        new Student("Steve", 18, List.of("Math", "Physics")),  // Two students with the same name but different ages and courses
-        new Student("Sheri", 64, List.of("Biology", "Riding")),
-        new Student("Jenny", 44, List.of("Math", "Teaching")),
-        new Student("Paul", 89, List.of("Math", "Electronics", "Raddars")),
+        new Student("Steve", 67, Arrays.asList("Math", "Physics")),
+        new Student("Steve", 18, Arrays.asList("Math", "Physics")),  // Two students with the same name but different ages and courses
+        new Student("Sheri", 64, Arrays.asList("Biology", "Riding")),
+        new Student("Jenny", 44, Arrays.asList("Math", "Teaching")),
+        new Student("Paul", 89, Arrays.asList("Math", "Electronics", "Raddars")),
     };
 
 
     public static void main(String[] args) {
         System.out.println("Examples of various Java data structures:");
+
+        System.out.print("\nQuickly generate the first 10 powers of 2 using IntStream: ");
+        int[] powersOfTwo = IntStream.iterate(1, n -> n * 2)
+            .limit(10)
+            .toArray();
+        IntStream.of(powersOfTwo).forEach(e -> System.out.print(e + " "));
+        System.out.println();
+
+        System.out.println("\nCreate a sorted TreeMap of students by name:");
+        Map<String, Student> studentMap = Stream.of(students).collect(Collectors.toMap(
+            Student::name,  // Key mapper: use the student's name as the key
+            s -> s,         // Value mapper: use the student object as the value
+            (s1, s2) -> s1, // Merge function: in case of duplicate keys, keep the first student
+            TreeMap::new)); // Supplier: create a new TreeMap
+        studentMap.forEach((name, student) -> System.out.println(name + " is " + student.age() + " years old"));
 
         System.out.println("\nPriorityQueue of students with custom comparator (sorted by age):");
         // PriorityQueue<Student> queue = new PriorityQueue<>(64, (s1,s2) ->Integer.compare(s1.age(), s2.age()));

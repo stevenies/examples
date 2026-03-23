@@ -53,16 +53,16 @@ public class Streams {
 
     // Create some test data
     static Student[] students = {
-        new Student("Steve", 67, List.of("Math", "Physics")),
-        new Student("Steve", 18, List.of("Math", "Physics")),  // Two students with the same name but different ages and courses
-        new Student("Sheri", 64, List.of("Biology", "Riding")),
-        new Student("Jenny", 44, List.of("Math", "Teaching", "Classroom Management", "Education")),
-        new Student("Paul", 89, List.of("Math", "Electronics", "Raddars")),
+        new Student("Steve", 67, Arrays.asList("Math", "Physics")),
+        new Student("Steve", 18, Arrays.asList("Math", "Physics")),  // Two students with the same name but different ages and courses
+        new Student("Sheri", 64, Arrays.asList("Biology", "Riding")),
+        new Student("Jenny", 44, Arrays.asList("Math", "Teaching", "Classroom Management", "Education")),
+        new Student("Paul", 89, Arrays.asList("Math", "Electronics", "Raddars")),
    };
 
 
     public static void main(String[] args) {
-        System.out.println("Examples of using streams for various operations on collections:");
+        System.out.println("Examples of using Java 8 streams for various operations on collections:");
 
         System.out.print("\nQuickly generate the first 10 powers of 2 using IntStream: ");
         int[] powersOfTwo = IntStream.iterate(1, n -> n * 2)
@@ -72,7 +72,7 @@ public class Streams {
         System.out.println();
 
         System.out.print("\nUse reduce to calculate the product of numbers from 1 to 10: ");
-        List<Long> oneToTen = LongStream.rangeClosed(1, 10).boxed().toList();
+        List<Long> oneToTen = LongStream.rangeClosed(1, 10).boxed().collect(Collectors.toList());
         long product = oneToTen.stream().reduce(1L, (total, item) -> total * item);
         System.out.println(String.format("%,d", product));
 
