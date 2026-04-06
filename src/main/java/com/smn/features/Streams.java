@@ -30,13 +30,12 @@ public class Streams {
 
     public static void main(String[] args) {
 
-
         //--- JAVA 8 STREAM EXAMPLES ---
         System.out.println("Examples of using Java 8 streams for various operations on collections:");
 
         System.out.print("\nQuickly generate the first 10 powers of 2 using IntStream: ");
         int[] powersOfTwo = IntStream.iterate(1, n -> n * 2).limit(10).toArray();
-        IntStream.of(powersOfTwo).forEach(e -> System.out.print(e + " "));
+        Arrays.stream(powersOfTwo).forEach(e -> System.out.print(e + " "));
         System.out.println();
 
         System.out.print("\nUse reduce to calculate the product of numbers from 1 to 10: ");

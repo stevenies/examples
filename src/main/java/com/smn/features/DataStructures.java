@@ -157,9 +157,9 @@ public class DataStructures {
 
         System.out.println("\nFIFO queue using ArrayDeque:");
         Deque<String> fifoQueue = new ArrayDeque<>();
-        fifoQueue.offer("First");
-        fifoQueue.offer("Second");
-        fifoQueue.offer("Third");
+        fifoQueue.add("First");
+        fifoQueue.add("Second");
+        fifoQueue.add("Third");
         System.out.println("Queue after adding 3 elements: " + fifoQueue);
         System.out.println("Polling from queue: " + fifoQueue.poll());
         System.out.println("Queue after polling: " + fifoQueue);
