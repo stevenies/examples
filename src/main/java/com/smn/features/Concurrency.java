@@ -82,8 +82,7 @@ public class Concurrency {
             while (true) {
                 System.out.println("\n=== Select an example to run: ================================");
                 System.out.println("0. Exit");
-                System.out.println("1. Passing data between threads using CompletableFuture");
-                System.out.println();
+                System.out.println("1. Passing data between threads");
                 switch (scanner.nextInt()) {
                     case 0 -> {
                         return;
