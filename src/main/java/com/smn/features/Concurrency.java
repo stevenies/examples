@@ -1,13 +1,12 @@
 package com.smn.features;
 
+import com.smn.utils.Http;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Supplier;
-import java.util.stream.*;
 
 public class Concurrency {
 
-    // Example of passing data between threads using CompletableFuture
+    // Example of passing data between CompletableFuture threads 
     private static void passingDataBetweenThreads() {
 
         final long producerDelay = 1000L;
@@ -15,7 +14,7 @@ public class Concurrency {
         final int queueSize = 2;
 
         // Create a blocking queue to hold data produced by the producer thread
-        BlockingQueue<String> queue = new LinkedBlockingQueue<>(queueSize);
+        BlockingQueue<String> queue = new ArrayBlockingQueue<>(queueSize);
 
         // Simulate a producer that generates data
         Runnable producer = () -> {
@@ -56,7 +55,7 @@ public class Concurrency {
             }
         };
  
-        // Create a pool of two threads to use for the producer and consumer.
+        // Create a pool of threads to use for the producer and consumer.
         ExecutorService executor = Executors.newFixedThreadPool(2);
 
         // Start the threads.
@@ -69,11 +68,53 @@ public class Concurrency {
         executor.shutdown();
     }
 
-    private static String timeSeconds() {
-        long timeMillis = System.currentTimeMillis();
-        return String.valueOf(timeMillis % 100000);
+       // Create a list of websites to fetch content from. These should be simple endpoints that return text for easy word counting.
+    static String[] websites = {
+        "https://api-excellence.com",
+        "https://www.cnn.com",
+        "https://www.ietf.org/rfc/rfc2616.txt"
+    };
+
+    // Count the number of words contained within a collection of websites
+    private static void countWordsManyWebsites() {
+
+         // Create a CompletableFuture for each website to count the number of words
+        List<CompletableFuture<Integer>> websiteMetrics = Arrays.stream(websites).map(url -> {
+            return countWordsSingleWebsite(url);
+        }).toList();
+
+        // Wait for all futures to complete and sum the total word count
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(websiteMetrics.toArray(new CompletableFuture[0]));
+        CompletableFuture<Void> summary = allFutures.thenRun(() -> {
+            int totalWords = websiteMetrics.stream().mapToInt(future -> future.join()).sum();
+            System.out.println(timeSeconds() + " Total words across all websites: " + totalWords);
+        });
+
+        // Wait for the summary to complete before exiting
+        summary.join();
     }
-    
+
+    private static CompletableFuture<Integer> countWordsSingleWebsite(String url) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                System.out.println(timeSeconds() + " Fetching content from " + url);
+                String content = Http.fetchWebContent(url);
+                int wordCount = content.split("\\s+").length;
+                System.out.println(timeSeconds() + " " + url + " has " + wordCount + " words");
+                return wordCount;
+            } catch (Exception e) {
+                System.err.println(timeSeconds() + " Error fetching content from " + url + " - " + e.getMessage());
+                return 0; // Return 0 words if there's an error
+            }
+        });
+    }
+
+    // Helper method to get the current time in seconds with milliseconds for better readability
+    private static String timeSeconds() {
+        String timeMillis = String.valueOf(System.currentTimeMillis());
+        int length = timeMillis.length();
+        return timeMillis.substring(length-6, length-4) + "." + timeMillis.substring(length-3);
+    }
 
     public static void main(String[] args) {
         System.out.println("Examples of using concurrency features in Java 8:");
@@ -83,11 +124,18 @@ public class Concurrency {
                 System.out.println("\n=== Select an example to run: ================================");
                 System.out.println("0. Exit");
                 System.out.println("1. Passing data between threads");
+                System.out.println("2. Count words in single website");
+                System.out.println("3. Count words in many websites");
+                System.out.print("Choice: ");
                 switch (scanner.nextInt()) {
                     case 0 -> {
                         return;
                     }
                     case 1 -> passingDataBetweenThreads();
+                    case 2 -> countWordsSingleWebsite(websites[0]).thenAccept(wordCount -> {
+                        System.out.println(timeSeconds() + " " + websites[0] + " has " + wordCount + " words");
+                    });
+                    case 3 -> countWordsManyWebsites();
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
             }
