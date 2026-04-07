@@ -16,7 +16,7 @@ public class Http {
      * @return The content of the web page as a String
      * @throws Exception if there's an error fetching the content
      */
-    public static String fetchWebContent(String url) throws Exception {
+    public static String fetchContent(String url) throws Exception {
         HttpClient client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();

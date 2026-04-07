@@ -68,25 +68,26 @@ public class Concurrency {
         executor.shutdown();
     }
 
-       // Create a list of websites to fetch content from. These should be simple endpoints that return text for easy word counting.
-    static String[] websites = {
+       // Create a list of websites from which to fetch content.
+    static String[] websiteUrls = {
         "https://api-excellence.com",
         "https://www.cnn.com",
         "https://www.ietf.org/rfc/rfc2616.txt"
     };
 
     // Count the number of words contained within a collection of websites
-    private static void countWordsManyWebsites() {
+    private static void countWordsMultipleWebsites() {
 
          // Create a CompletableFuture for each website to count the number of words
-        List<CompletableFuture<Integer>> websiteMetrics = Arrays.stream(websites).map(url -> {
+        List<CompletableFuture<Integer>> metrics = Arrays.stream(websiteUrls).map(url -> {
             return countWordsSingleWebsite(url);
         }).toList();
 
         // Wait for all futures to complete and sum the total word count
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(websiteMetrics.toArray(new CompletableFuture[0]));
-        CompletableFuture<Void> summary = allFutures.thenRun(() -> {
-            int totalWords = websiteMetrics.stream().mapToInt(future -> future.join()).sum();
+        CompletableFuture<Void> wrapper = CompletableFuture.allOf(
+            metrics.toArray(new CompletableFuture[0]));  // Array is needed because allOf takes varargs.  Empty array is needed so that resulting array is typed
+        CompletableFuture<Void> summary = wrapper.thenRun(() -> {   // Wrapper completes when all individual futures complete
+            int totalWords = metrics.stream().mapToInt(future -> future.join()).sum();  // Join each future to get its value
             System.out.println(timeSeconds() + " Total words across all websites: " + totalWords);
         });
 
@@ -98,7 +99,7 @@ public class Concurrency {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 System.out.println(timeSeconds() + " Fetching content from " + url);
-                String content = Http.fetchWebContent(url);
+                String content = Http.fetchContent(url);
                 int wordCount = content.split("\\s+").length;
                 System.out.println(timeSeconds() + " " + url + " has " + wordCount + " words");
                 return wordCount;
@@ -125,17 +126,19 @@ public class Concurrency {
                 System.out.println("0. Exit");
                 System.out.println("1. Passing data between threads");
                 System.out.println("2. Count words in single website");
-                System.out.println("3. Count words in many websites");
+                System.out.println("3. Count words in multiple websites");
                 System.out.print("Choice: ");
+
                 switch (scanner.nextInt()) {
                     case 0 -> {
                         return;
                     }
                     case 1 -> passingDataBetweenThreads();
-                    case 2 -> countWordsSingleWebsite(websites[0]).thenAccept(wordCount -> {
-                        System.out.println(timeSeconds() + " " + websites[0] + " has " + wordCount + " words");
-                    });
-                    case 3 -> countWordsManyWebsites();
+                    case 2 -> {
+                        CompletableFuture<Integer> thread = countWordsSingleWebsite(websiteUrls[0]);
+                        thread.join();  // Wait for the thread to complete before exiting
+                    }
+                    case 3 -> countWordsMultipleWebsites();
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
             }
