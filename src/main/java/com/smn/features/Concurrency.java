@@ -6,8 +6,27 @@ import java.util.concurrent.*;
 
 public class Concurrency {
 
+    private static void doChainingExample() {
+        System.out.println("Chaining Example - main thread is " + Thread.currentThread().getName());
+        CompletableFuture<Void> thread = CompletableFuture.supplyAsync(() -> {   // SupplyAsync starts a new thread and returns a value
+            doWork();
+            System.out.println("Passing \"Steve\" to thenApplyAsync");
+            return "Steve";
+        }).thenApplyAsync(value -> {  // thenApplyAsync takes the result of the previous stage and returns a new value
+            System.out.println("Received \"" + value + "\" in thenApplyAsync on Thread " + Thread.currentThread().getName());
+            doWork();
+            System.out.println("Passing \"Steve Nies\" to thenAcceptAsync");
+            return value + " Nies";
+        }).thenAcceptAsync(value -> {  // thenAcceptAsync takes the result of the previous stage and returns void
+            System.out.println("Received \"" + value + "\" from thenApplyAsync on Thread " + Thread.currentThread().getName());
+            doWork();
+        });
+        System.out.println("Waiting for threads to finish. Main thread is " + Thread.currentThread().getName());
+        thread.join(); // Wait for the thread to complete before exiting
+    }
+
     // Example of passing data between CompletableFuture threads 
-    private static void passingDataBetweenThreads() {
+    private static void doPassDataBetweenThreads() {
 
         final long producerDelay = 1000L;
         final long consumerDelay = 3000L;
@@ -75,8 +94,13 @@ public class Concurrency {
         "https://www.ietf.org/rfc/rfc2616.txt"
     };
 
+    private static void doCountWordsSingleWebsite() {
+        CompletableFuture<Integer> thread = countWordsSingleWebsite(websiteUrls[0]);
+        thread.join();  // Wait for the thread to complete before exiting
+    }
+
     // Count the number of words contained within a collection of websites
-    private static void countWordsMultipleWebsites() {
+    private static void doCountWordsMultipleWebsites() {
 
          // Create a CompletableFuture for each website to count the number of words
         List<CompletableFuture<Integer>> metrics = Arrays.stream(websiteUrls).map(url -> {
@@ -110,6 +134,17 @@ public class Concurrency {
         });
     }
 
+    private static void doWork() {
+        try {
+            for (int i = 0; i < 3; i++) {
+                System.out.println(timeSeconds() + " Doing work " + (i + 1) + " on Thread " + Thread.currentThread().getName());
+                Thread.sleep(1000); // Simulate time-consuming work
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     // Helper method to get the current time in seconds with milliseconds for better readability
     private static String timeSeconds() {
         String timeMillis = String.valueOf(System.currentTimeMillis());
@@ -123,22 +158,30 @@ public class Concurrency {
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
                 System.out.println("\n=== Select an example to run: ================================");
-                System.out.println("0. Exit");
-                System.out.println("1. Passing data between threads");
-                System.out.println("2. Count words in single website");
-                System.out.println("3. Count words in multiple websites");
+                System.out.println("0: Exit");
+                System.out.println("1: Passing data between threads");
+                System.out.println("2: Chaining CompletableFutures");
+                System.out.println("3: Count words in single website");
+                System.out.println("4: Count words in multiple websites");
                 System.out.print("Choice: ");
 
-                switch (scanner.nextInt()) {
+                int choice;
+                try {
+                    choice = scanner.nextInt();
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Please enter a number.");
+                    scanner.nextLine(); // Clear the invalid input
+                    continue;
+                }
+
+                switch (choice) {
                     case 0 -> {
                         return;
                     }
-                    case 1 -> passingDataBetweenThreads();
-                    case 2 -> {
-                        CompletableFuture<Integer> thread = countWordsSingleWebsite(websiteUrls[0]);
-                        thread.join();  // Wait for the thread to complete before exiting
-                    }
-                    case 3 -> countWordsMultipleWebsites();
+                    case 1 -> doPassDataBetweenThreads();
+                    case 2 -> doChainingExample();
+                    case 3 -> doCountWordsSingleWebsite();
+                    case 4 -> doCountWordsMultipleWebsites();
                     default -> System.out.println("Invalid choice. Please try again.");
                 }
             }
