@@ -6,6 +6,7 @@ import java.util.concurrent.*;
 
 public class Concurrency {
 
+    // Example of chaining CompletableFuture stages together, passing data between them, and running them on different threads
     private static void doChainingExample() {
         System.out.println("Chaining Example - main thread is " + Thread.currentThread().getName());
         CompletableFuture<Void> thread = CompletableFuture.supplyAsync(() -> {   // SupplyAsync starts a new thread and returns a value
@@ -87,24 +88,23 @@ public class Concurrency {
         executor.shutdown();
     }
 
-       // Create a list of websites from which to fetch content.
-    static String[] websiteUrls = {
-        "https://api-excellence.com",
-        "https://www.cnn.com",
-        "https://www.ietf.org/rfc/rfc2616.txt"
-    };
-
     private static void doCountWordsSingleWebsite() {
-        CompletableFuture<Integer> thread = countWordsSingleWebsite(websiteUrls[0]);
+        CompletableFuture<Integer> thread = countWebsiteWords("https://api-excellence.com");
         thread.join();  // Wait for the thread to complete before exiting
     }
 
-    // Count the number of words contained within a collection of websites
     private static void doCountWordsMultipleWebsites() {
+
+        // Create a list of websites from which to fetch content.
+        String[] websiteUrls = {
+            "https://api-excellence.com",
+            "https://www.cnn.com",
+            "https://www.ietf.org/rfc/rfc2616.txt"
+        };
 
          // Create a CompletableFuture for each website to count the number of words
         List<CompletableFuture<Integer>> metrics = Arrays.stream(websiteUrls).map(url -> {
-            return countWordsSingleWebsite(url);
+            return countWebsiteWords(url);
         }).toList();
 
         // Wait for all futures to complete and sum the total word count
@@ -119,7 +119,8 @@ public class Concurrency {
         summary.join();
     }
 
-    private static CompletableFuture<Integer> countWordsSingleWebsite(String url) {
+    // Helper method to count words in a single website asynchronously
+    private static CompletableFuture<Integer> countWebsiteWords(String url) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 System.out.println(timeSeconds() + " Fetching content from " + url);
@@ -134,6 +135,7 @@ public class Concurrency {
         });
     }
 
+    // Helper method to simulate time-consuming work
     private static void doWork() {
         try {
             for (int i = 0; i < 3; i++) {
