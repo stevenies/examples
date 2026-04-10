@@ -1,10 +1,24 @@
 package com.smn.features;
 
 import com.smn.utils.Http;
+
+import jakarta.validation.constraints.Size;
+
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy.Fixed;
+import org.springframework.scheduling.annotation.Scheduled;
+
 public class Concurrency {
+
+    // Thread Pool Types:
+    //      Single-thread executor: strict ordering on one worker. Perfect for serialised work. No parallelism.
+    //      Fixed thread pool: stable thread count, unbounded queue by default. Great for CPU work when sized to cores. Watch for growing queues.
+    //      Cached thread pool: grows on demand, shrinks when idle. Responsible for short I/O tasks. Dangerous under sustained flood.
+    //      Work-stealing (ForkJoinPool): per-worker deques and stealing. Best for CPU-bound, fork/join style tasks. Avoid blocking.
+    //      Scheduled thread pool: timers and periodic work. Size it to the concurrent tasks. Understand fixed-rate vs fixed-delay.
+    //      Virtual threads (JDK 21+): cheap thread per task. Excellent for I/O heavy concurrency without giant platform-thread pools.
 
     // Example of chaining CompletableFuture stages together, passing data between them, and running them on different threads
     private static void doChainingExample() {

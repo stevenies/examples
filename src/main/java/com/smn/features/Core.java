@@ -33,6 +33,7 @@ public class Core {
             //      \s	Find a whitespace character
             //      \b	Find a match at the beginning of a word like this: \bWORD, or at the end of a word like this: WORD\b
             //      \w	Find a word character [a-zA-Z0-9_]
+            //      \1  Find a match for the text found in the first capturing group as in: <(.+)>([^<]+)</\1>
             // Quantifiers:
             //      n+	Matches any string that contains at least one n
             //      n*	Matches any string that contains zero or more occurrences of n

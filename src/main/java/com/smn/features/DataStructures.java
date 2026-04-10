@@ -93,14 +93,14 @@ public class DataStructures {
     };
 
     // Create a list of classes offered at the school.
-    static List<String> classes = Stream.of(students).flatMap(s -> s.courses().stream()).distinct().toList();
+    static List<String> classes = Arrays.stream(students).flatMap(s -> s.courses().stream()).distinct().sorted().toList();
 
     public static void main(String[] args) {
         System.out.println("Examples of various Java data structures:");
 
         System.out.print("\nQuickly generate the first 10 powers of 2 using IntStream: ");
         int[] powersOfTwo = IntStream.iterate(1, n -> n * 2).limit(10).toArray();
-        IntStream.of(powersOfTwo).forEach(e -> System.out.print(e + " "));
+        Arrays.stream(powersOfTwo).forEach(e -> System.out.print(e + " "));
         System.out.println();
 
         System.out.print("\nUse a Comparator to sort students by age (old to young): ");
