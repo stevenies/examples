@@ -18,9 +18,35 @@ spring:
     port: 587
     username: support@api-excellence.com
     password: 2Chron7:14!!
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: thermostat-consumer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      auto-commit-interval: 1000ms
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      acks: all
+      retries: 0
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          autoconfigure:
+            logging:
+              ConditionEvaluationReportLoggingListener: debug
+
